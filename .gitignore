@@ -19,6 +19,7 @@ captures/
 *.properties
 .env
 !gradle.properties
+!.github/ci-gradle.properties
 
 # OS
 .DS_Store
