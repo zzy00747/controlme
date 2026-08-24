@@ -1,0 +1,28 @@
+# Gradle
+.gradle/
+build/
+
+# Android / IntelliJ
+.idea/
+*.iml
+local.properties
+captures/
+.cxx/
+.externalNativeBuild/
+
+# Kotlin
+.kotlin/
+
+# Signing / secrets — 绝不上传
+*.jks
+*.keystore
+*.properties
+.env
+!gradle.properties
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Godot / misc (本项目用不到,保留无害)
+*.tmp
