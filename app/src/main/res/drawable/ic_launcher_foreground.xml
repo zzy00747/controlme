@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- 简洁占位图标:白色圆底 + 深色对勾。后续按品牌重绘。 -->
+    <group
+        android:scaleX="0.52"
+        android:scaleY="0.52"
+        android:pivotX="54"
+        android:pivotY="54">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M54,28 a26,26 0 1,1 -0.01,0 z" />
+        <path
+            android:fillColor="#1B5E20"
+            android:pathData="M42,54 l8,8 l16,-18 l4,4 l-20,22 l-8,-8 z" />
+    </group>
+</vector>

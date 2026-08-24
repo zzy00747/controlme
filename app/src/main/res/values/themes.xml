@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compose 完全接管界面,仅用系统基础 NoActionBar 主题作为启动窗口背景。 -->
+    <style name="Theme.ControlMe" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
