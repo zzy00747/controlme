@@ -1,0 +1,79 @@
+name: CI
+
+# 触发:main 推送 + PR + 手动。paths-ignore 排除纯文档改动,
+# 避免脚手架(app/ 存在前)因文档提交就被触发而失败。
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'AGENTS.md'
+      - '.editorconfig'
+      - '.gitattributes'
+      - '.github/**'   # 排除本 workflow 自身与其他 .github 文件
+  pull_request:
+  workflow_dispatch:
+
+# PR 反复推送时取消旧运行,只保留最新,省 CI 时间。
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 校验 gradle wrapper jar 未被篡改(供应链安全)。
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v3
+
+      - name: Configure JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      # 内置 ~/.gradle 依赖缓存(默认 key 含 runner.os + gradle 版本 + restore-keys)。
+      # 注意:setup-java 里不要再设 cache: gradle,避免双缓存。
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # 用 CI 专用 gradle.properties,避免把本机内存/参数带进 CI。
+      - name: Isolated Gradle properties for CI
+        run: cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+
+      - name: Lint
+        run: ./gradlew :app:lintDebug
+
+      # 覆盖 AGENTS.md 要求的:domain 状态机(DRAFT→COMMIT/DELETE/MEMO)、
+      # LLM 协议黄金样例测试。instrumented 测试需模拟器,留待后续独立 job。
+      - name: Unit tests
+        run: ./gradlew :app:testDebugUnitTest
+
+      - name: Build debug APK
+        run: ./gradlew :app:assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: apk
+          path: '**/build/outputs/apk/**/*.apk'
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: '**/build/test-results/'
+
+      - name: Upload lint report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lint
+          path: '**/build/reports/lint-results-*.html'
